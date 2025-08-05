@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEET Questions Viewer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .question-container {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .question-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .question-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .correct-percentage {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .question-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 15px 0;
+            color: #333;
+        }
+        
+        .question-content {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 10px;
+            border: 1px solid #eee;
+        }
+        
+        .options-container {
+            margin: 20px 0;
+        }
+        
+        .option {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .option:hover {
+            background: #f0f0f0;
+        }
+        
+        .option.likely-correct {
+            border-color: #4CAF50;
+            background: #f0fff0;
+        }
+        
+        .option-number {
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .likely-correct .option-number {
+            background: #4CAF50;
+        }
+        
+        .option-content {
+            flex-grow: 1;
+        }
+        
+        .option-percentage {
+            margin-left: auto;
+            padding: 3px 8px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #666;
+            min-width: 35px;
+            text-align: center;
+        }
+        
+        .likely-correct .option-percentage {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .topics {
+            margin: 15px 0;
+        }
+        
+        .topic-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
+            border: 1px solid #bbdefb;
+        }
+        
+        .analytics-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .analytics-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #17a2b8;
+        }
+        
+        .search-container {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .error {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .question-stats {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NEET Questions Viewer</h1>
+        <p>Browse through NEET questions with analytics and likely correct answers</p>
+    </div>
+    
+    <div class="search-container">
+        <div style="margin-bottom: 20px;">
+            <label for="questionSetSelect" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Select Question Set:</label>
+            <select id="questionSetSelect" style="padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; min-width: 200px; outline: none;">
+                <option value="">Choose a question set...</option>
+            </select>
+        </div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search questions by title, topic, or content..." disabled>
+    </div>
+    
+    <div id="questionsContainer">
+        <div class="loading">Loading questions...</div>
+    </div>
+
+    <script>
+        let questionsData = [];
+        let filteredQuestions = [];
+        let availableQuestionSets = ['8-53', '8-54', '8-55', '8-56']; // Available question sets
+
+        // Initialize the application
+        async function initializeApp() {
+            populateQuestionSetDropdown();
+            setupEventListeners();
+            document.getElementById('questionsContainer').innerHTML = '<div class="loading">Please select a question set to view questions.</div>';
+        }
+
+        // Populate the dropdown with available question sets
+        function populateQuestionSetDropdown() {
+            const select = document.getElementById('questionSetSelect');
+            
+            availableQuestionSets.forEach(setName => {
+                const option = document.createElement('option');
+                option.value = setName;
+                option.textContent = `Question Set ${setName}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const questionSetSelect = document.getElementById('questionSetSelect');
+            const searchInput = document.getElementById('searchInput');
+            
+            questionSetSelect.addEventListener('change', (e) => {
+                const selectedSet = e.target.value;
+                if (selectedSet) {
+                    loadQuestions(selectedSet);
+                    searchInput.disabled = false;
+                    searchInput.placeholder = "Search questions by title, topic, or content...";
+                } else {
+                    questionsData = [];
+                    filteredQuestions = [];
+                    document.getElementById('questionsContainer').innerHTML = '<div class="loading">Please select a question set to view questions.</div>';
+                    searchInput.disabled = true;
+                    searchInput.placeholder = "Select a question set first...";
+                    searchInput.value = '';
+                }
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                if (questionsData.length === 0) return;
+                
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    filteredQuestions = questionsData;
+                } else {
+                    filteredQuestions = questionsData.filter(question => {
+                        const titleMatch = question.title && question.title.toLowerCase().includes(searchTerm);
+                        const topicsMatch = question.topics && question.topics.some(topic => 
+                            topic.toLowerCase().includes(searchTerm)
+                        );
+                        const contentMatch = question.rawHTML && question.rawHTML.toLowerCase().includes(searchTerm);
+                        
+                        return titleMatch || topicsMatch || contentMatch;
+                    });
+                }
+                
+                displayQuestions(filteredQuestions);
+            });
+        }
+
+        // Load questions from selected set
+        async function loadQuestions(questionSet) {
+            try {
+                document.getElementById('questionsContainer').innerHTML = '<div class="loading">Loading questions from set ' + questionSet + '...</div>';
+                
+                const response = await fetch(`./questions/${questionSet}.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                questionsData = await response.json();
+                filteredQuestions = questionsData;
+                displayQuestions(filteredQuestions);
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                document.getElementById('questionsContainer').innerHTML = `
+                    <div class="error">
+                        <h3>Error Loading Questions</h3>
+                        <p>Failed to load questions from ${questionSet}.json</p>
+                        <p>Make sure the JSON file exists in the questions folder.</p>
+                        <p>Error details: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayQuestions(questions) {
+            const container = document.getElementById('questionsContainer');
+            
+            if (questions.length === 0) {
+                container.innerHTML = '<div class="loading">No questions found matching your search.</div>';
+                return;
+            }
+
+            const questionsHTML = questions.map(question => {
+                const analytics = question.analytics || {};
+                const options = ['option1Percentage', 'option2Percentage', 'option3Percentage', 'option4Percentage'];
+                
+                // Find the option with highest percentage (likely correct answer)
+                let maxPercentage = 0;
+                let likelyCorrectOption = 0;
+                options.forEach((opt, index) => {
+                    const percentage = parseInt(analytics[opt]) || 0;
+                    if (percentage > maxPercentage) {
+                        maxPercentage = percentage;
+                        likelyCorrectOption = index + 1;
+                    }
+                });
+
+                const topicsHTML = question.topics ? 
+                    question.topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('') : '';
+
+                const optionsHTML = ['1', '2', '3', '4'].map((optNum, index) => {
+                    const percentage = analytics[`option${optNum}Percentage`] || 0;
+                    const isLikelyCorrect = (index + 1) === likelyCorrectOption && maxPercentage > 35;
+                    
+                    return `
+                        <div class="option ${isLikelyCorrect ? 'likely-correct' : ''}">
+                            <div class="option-number">${optNum}</div>
+                            <div class="option-content">Option ${optNum}</div>
+                            <div class="option-percentage">${percentage}%</div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="question-container">
+                        <div class="question-header">
+                            <div class="question-number">Question ${question.number}</div>
+                            <div class="question-stats">
+                                <span class="stat-badge correct-percentage">
+                                    ${analytics.correctPercentage ? parseFloat(analytics.correctPercentage).toFixed(1) : 'N/A'}% Correct
+                                </span>
+                                ${question.isNcert ? '<span class="stat-badge">NCERT</span>' : ''}
+                                ${question.isPaid ? '<span class="stat-badge">Premium</span>' : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="question-title">
+                            ${question.title || 'No title available'}
+                        </div>
+                        
+                        ${question.rawHTML ? `
+                            <div class="question-content">
+                                ${question.rawHTML}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="options-container">
+                            <h4>Answer Options:</h4>
+                            ${optionsHTML}
+                        </div>
+                        
+                        ${topicsHTML ? `
+                            <div class="topics">
+                                <strong>Topics:</strong> ${topicsHTML}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="analytics-section">
+                            <div class="analytics-title">Answer Statistics:</div>
+                            <div>
+                                Option 1: ${analytics.option1Percentage || 0}% • 
+                                Option 2: ${analytics.option2Percentage || 0}% • 
+                                Option 3: ${analytics.option3Percentage || 0}% • 
+                                Option 4: ${analytics.option4Percentage || 0}%
+                            </div>
+                            ${maxPercentage > 35 ? `
+                                <div style="margin-top: 10px; color: #4CAF50; font-weight: bold;">
+                                    ✓ Most likely correct answer: Option ${likelyCorrectOption} (${maxPercentage}% of responses)
+                                </div>
+                            ` : `
+                                <div style="margin-top: 10px; color: #ff9800;">
+                                    ⚠ No clear consensus on correct answer
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = questionsHTML;
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
